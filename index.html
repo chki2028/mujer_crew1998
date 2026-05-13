@@ -8,40 +8,30 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Noto Sans KR', sans-serif; background-color: #030303; color: #e5e5e5; }
+    body { font-family: 'Noto Sans KR', sans-serif; background-color: #050505; color: #ffffff; }
     .font-serif { font-family: 'Cinzel', serif; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    .animate-fade-in { animation: fadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .glass-panel { background: rgba(25, 25, 25, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
-    .gold-text { background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .glass-panel { background: rgba(30, 30, 30, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); }
+    .gold-text { background: linear-gradient(to right, #e6c27a, #fff2c8, #d4af37, #ffe58f); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 0px 2px 10px rgba(212, 175, 55, 0.2); }
+    .neon-red { color: #ff3333; text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000; }
     html { scroll-behavior: smooth; }
   </style>
 </head>
-<body class="antialiased selection:bg-[#bf953f] selection:text-black">
+<body class="antialiased">
   <div id="root"></div>
 
   <script type="text/babel">
     const { useState, useEffect } = React;
 
-    const PremiumImage = ({ src, alt, className }) => {
+    const ArchiveImage = ({ src, alt, className }) => {
       const [hasError, setHasError] = useState(false);
-      if (hasError) {
-        return (
-          <div className={`flex flex-col items-center justify-center bg-[#0a0a0a] border border-white/5 p-6 text-center ${className}`}>
-            <span className="text-gray-600 text-[10px] tracking-widest uppercase">Asset Offline</span>
-          </div>
-        );
-      }
-      return (
-        <img 
-          src={src} 
-          alt={alt} 
-          className={`object-cover transition-transform duration-1000 hover:scale-110 ${className}`}
-          onError={() => setHasError(true)}
-        />
+      return hasError ? (
+        <div className={`flex flex-col items-center justify-center bg-[#111] border border-red-500/30 p-4 text-center ${className}`}>
+          <span className="text-red-400 text-[10px] tracking-widest uppercase font-bold">Data Corrupted: {alt}</span>
+        </div>
+      ) : (
+        <img src={src} alt={alt} className={`object-cover transition-all duration-700 hover:scale-105 ${className}`} onError={() => setHasError(true)} />
       );
     };
 
@@ -51,170 +41,186 @@
       const [lyricIndex, setLyricIndex] = useState(0);
 
       const tracks = [
-        {
-          title: "MUJER'S CALL",
-          videoSrc: "KakaoTalk_Video_2026-05-13-14-33-07-3.mp4",
-          lyrics: ["나가자 무저크루의 븅순들과", "모두 보들들 어깨마다 걸치고", "무저가 언제 어디로 가더라도", "우리는 욕해 보스턴 보들쓰리", "무저가 부를때"]
-        },
-        {
-          title: "WINGS OF YEOMBYEONG",
-          videoSrc: "KakaoTalk_Video_2026-05-13-14-33-07-2.mp4",
-          lyrics: ["돈까스팔러 어디라도 따라", "염병따라 네지랄을 담아", "날아가 무저년 저 보들끝까지", "섬진강 염병의 날개로", "campeon", "synapses", "bottlethree", "docbond"]
-        }
+        { title: "TRACK 1: MUJER'S CALL", videoSrc: "KakaoTalk_Video_2026-05-13-14-33-07-3.mp4", lyrics: ["나가자 무저크루의 븅순들과", "모두 보들들 어깨마다 걸치고", "무저가 언제 어디로 가더라도", "우리는 욕해 보스턴 보들쓰리", "무저가 부를때"] },
+        { title: "TRACK 2: WINGS OF YEOMBYEONG", videoSrc: "KakaoTalk_Video_2026-05-13-14-33-07-2.mp4", lyrics: ["돈까스팔러 어디라도 따라", "염병따라 네지랄을 담아", "날아가 무저년 저 보들끝까지", "섬진강 염병의 날개로", "campeon", "synapses", "bottlethree", "docbond"] },
+        { title: "TRACK 3: SECRET VAULT", videoSrc: "KakaoTalk_Video_2026-05-13-14-33-07-1.mp4", lyrics: ["(기밀 영상 재생 중...)", "접근 권한 확인 완료", "무저 련합의 숨겨진 기록", "Data Loading..."] }
       ];
 
       useEffect(() => {
         let interval;
         if (isPlaying) {
-          interval = setInterval(() => {
-            setLyricIndex((prev) => (prev < tracks[currentTrack].lyrics.length - 1 ? prev + 1 : prev));
-          }, 2500);
+          interval = setInterval(() => { setLyricIndex((prev) => (prev < tracks[currentTrack].lyrics.length - 1 ? prev + 1 : prev)); }, 2500);
         }
         return () => clearInterval(interval);
       }, [isPlaying, currentTrack]);
 
-      useEffect(() => { setLyricIndex(0); }, [currentTrack]);
-
       const pioneers = [
-        { name: "ODONGHYOP", role: "Gastronomic Director", tags: ["Ddakgalbi", "Yugane", "Seomjin River"], desc: "무저크루의 미식 파트를 담당하며 K-전통 퍼레이드 등 크루의 정체성 확장을 이끌고 있습니다." },
-        { name: "MUJER", role: "Chief Visionary Officer", tags: ["Fimo", "Communication", "Global Marketer"], desc: "글로벌 마케팅 전략과 IP 콜라보레이션을 통해 무저크루의 비전을 현실화합니다." },
-        { name: "CHIGGAHWAN", role: "Chaos & Entertainment", tags: ["Unpredictable", "Football Fan"], desc: "자유로운 예술적 영감을 바탕으로 크루 내 예기치 못한 즐거움을 창조합니다." },
-        { name: "KIGPARK", role: "Aesthetic Specialist", tags: ["Codio", "K-Beauty", "Artisan"], desc: "미학적 완성도를 추구하며 K-뷰티 메이크업 분야의 새로운 기준을 제시합니다." }
+        { name: "odonghyop", tags: ["#닭갈비", "#K-국악", "#극대노"], desc: "무저크루의 닭갈비 담당. 롯데월드 K-국악 퍼레이드를 두고 무저와 치열하게 대립 중이다. 중국 양산형 공장 취급을 받으며 극대노의 대상이 되기도 한다." },
+        { name: "mujer", tags: ["#수장", "#fimo", "#가짜크루색출"], desc: "무저크루의 중심 인물. 롯데월드 외국인 타겟 IP 콜라보 마케팅을 주장하며 오동협을 압박한다. 밤에는 fimo와 카카오톡 통화로 피온을 하며 가짜 무저크루들을 색출한다." },
+        { name: "chiggahwan", tags: ["#폐급", "#염병", "#S25유니폼"], desc: "무저크루 혼돈의 결정체. 폐급과 염병이라는 키워드로 모든 것을 파괴한다. 길거리 한복판에서 삼성 갤럭시 S25 유니폼을 입고 북을 치는 예능감 담당." },
+        { name: "kigpark", tags: ["#렘병", "#codio", "#박씨집안몸종"], desc: "codio와 함께 기억되는 인물. 렘병이라는 키워드와 함께 '내가 박씨집안 몸종이야?!'라며 분노한다. 무저크루 내에서 독보적인 캐릭터를 유지 중이다." }
       ];
 
-      const federations = ["KONGZ CREW", "GRUPPO HEIKE", "DAKBON CREW", "TIENHAO CREW", "MCEVOY HANE CROWN", "RODS AND CONS CREW", "BOSTON LEADERS", "YEOMBYEONG CREW", "EEL CREW", "GRUPPO BOTTLE-3", "PIGEON CREW", "TRA-PIZZA CREW"];
+      const federations = ["콩즈 crew", "gruppo 헤이크", "닥본 crew", "tienhao crew", "맥에보이해인 크라운", "rods and cons crew", "boston leaders", "염병 crew", "eel crew", "트라피자 crew"];
 
       return (
         <div className="min-h-screen">
-          <nav className="fixed w-full z-50 glass-panel py-6 px-10 flex justify-between items-center border-none">
-            <h1 className="text-xl font-serif tracking-[0.5em] gold-text">MUJER 1998</h1>
-            <div className="hidden md:flex gap-10 text-[10px] tracking-[0.3em] font-light text-gray-400">
-              <a href="#about" className="hover:text-white transition-colors">ABOUT</a>
-              <a href="#alliance" className="hover:text-white transition-colors">ALLIANCE</a>
-              <a href="#members" className="hover:text-white transition-colors">PIONEERS</a>
-              <a href="#anthem" className="hover:text-white transition-colors">ANTHEM</a>
-              <a href="#archive" className="hover:text-white transition-colors">ARCHIVE</a>
+          <nav className="fixed w-full z-50 glass-panel py-4 px-8 flex justify-between items-center">
+            <h1 className="text-2xl font-serif tracking-widest gold-text font-bold">MUJER 1998</h1>
+            <div className="hidden md:flex gap-8 text-xs tracking-[0.2em] font-medium text-gray-200">
+              <a href="#about" className="hover:text-white hover:underline underline-offset-4">ABOUT</a>
+              <a href="#members" className="hover:text-white hover:underline underline-offset-4">PIONEERS</a>
+              <a href="#hostile" className="hover:text-red-400 hover:underline underline-offset-4">ENEMIES</a>
+              <a href="#archive" className="hover:text-white hover:underline underline-offset-4">ARCHIVE</a>
             </div>
           </nav>
-
-          {/* 1. Hero Section (NO ROOM FOR WARFAR 복구) */}
-          <section id="about" className="relative min-h-screen flex items-center justify-center px-4 pt-20 overflow-hidden bg-black">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#1a1a1a] via-[#050505] to-[#000000] -z-10"></div>
-            <div className="text-center max-w-4xl mx-auto animate-fade-in">
-              <span className="block text-[10px] tracking-[0.4em] text-[#bf953f] mb-8 uppercase opacity-80">Established in 1998</span>
-              <h2 className="text-5xl md:text-7xl font-serif mb-6 leading-tight tracking-widest text-white">NO ROOM FOR <br /><span className="gold-text">WARFAR</span></h2>
-              <div className="w-12 h-px bg-[#bf953f] mx-auto mb-8 opacity-50"></div>
-              <p className="text-sm md:text-base font-light text-gray-500 leading-relaxed max-w-2xl mx-auto tracking-[0.2em] uppercase mb-4">
-                ONE FEDERATION. ONE PURPOSE. ONE FUTURE.
-              </p>
-              <p className="text-sm font-light text-gray-600 leading-relaxed max-w-xl mx-auto tracking-wide">
-                우리는 시대의 흐름을 정의하고 새로운 문화를 창조합니다. MUJER CREW의 공식 아카이브에 오신 것을 환영합니다.
+          
+          {/* 히어로 섹션 */}
+          <section id="about" className="relative min-h-screen flex items-center justify-center pt-20 bg-[#0a0a0a] text-center">
+            <div className="max-w-4xl mx-auto px-4">
+              <span className="block text-xs tracking-[0.5em] text-[#d4af37] mb-6 uppercase font-bold">Established in 1998</span>
+              <h2 className="text-6xl md:text-8xl font-serif mb-6 leading-tight tracking-widest text-white">NO ROOM FOR <br /><span className="gold-text">WARFAR</span></h2>
+              <div className="w-16 h-1 bg-[#d4af37] mx-auto mb-8"></div>
+              <p className="text-lg md:text-xl font-medium text-gray-100 tracking-[0.2em] uppercase mb-4">ONE FEDERATION. ONE PURPOSE.</p>
+              <p className="text-sm text-gray-300 max-w-xl mx-auto tracking-wide leading-relaxed">
+                우리는 시대의 흐름을 정의하고 새로운 문화를 창조한다.<br/>대통합 무저 련합의 진짜 기록.
               </p>
             </div>
           </section>
 
-          {/* 2. Global Alliance Section (대통합 련합 목록 복구) */}
-          <section id="alliance" className="py-24 bg-[#050505] border-y border-white/5">
-            <div className="max-w-7xl mx-auto px-6 text-center">
-              <h3 className="font-serif text-2xl tracking-[0.5em] mb-12 gold-text uppercase">Global Alliance Network</h3>
-              <div className="flex flex-wrap justify-center gap-4 md:gap-8 opacity-80">
-                {federations.map((crew, idx) => (
-                  <div key={idx} className="px-6 py-3 text-xs md:text-sm tracking-widest font-serif text-gray-500 hover:text-white hover:border-[#bf953f] border border-transparent transition-all duration-300 cursor-default rounded-full bg-white/[0.02]">
-                    {crew}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* 3. Anthem Section (노래방) */}
-          <section id="anthem" className="py-40 px-6 bg-[#0a0a0a]">
-            <div className="max-w-6xl mx-auto">
-              <h3 className="text-center font-serif text-3xl tracking-[0.5em] mb-20 gold-text uppercase">Official Anthem</h3>
-              <div className="glass-panel rounded-3xl flex flex-col lg:flex-row overflow-hidden shadow-2xl border-white/5">
-                <div className="flex-1 bg-black p-6 md:p-10 flex flex-col gap-8">
-                  <div className="flex gap-6">
-                    {tracks.map((track, idx) => (
-                      <button key={idx} onClick={() => setCurrentTrack(idx)} className={`text-[10px] tracking-[0.3em] uppercase transition-all ${currentTrack === idx ? 'text-[#bf953f] border-b border-[#bf953f] pb-1' : 'text-gray-600 hover:text-gray-400'}`}>{track.title}</button>
-                    ))}
-                  </div>
-                  <div className="relative aspect-video rounded-2xl overflow-hidden bg-[#020202] border border-white/5">
-                    <video key={tracks[currentTrack].videoSrc} src={tracks[currentTrack].videoSrc} controls className="w-full h-full object-contain" onPlay={() => setIsPlaying(true)} onPause={() => setIsPlaying(false)}></video>
-                  </div>
-                </div>
-                <div className="lg:w-1/3 bg-[#080808] p-10 md:p-16 flex flex-col justify-center border-l border-white/5">
-                  <div className="space-y-6 text-center">
-                    {tracks[currentTrack].lyrics.map((line, idx) => (
-                      <p key={idx} className={`transition-all duration-1000 font-light tracking-widest ${lyricIndex === idx && isPlaying ? 'text-lg text-white' : 'text-xs text-gray-700'}`}>{line}</p>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* 4. Pioneers Section (멤버 상세 설명 및 태그 복구) */}
-          <section id="members" className="py-40 px-6 max-w-7xl mx-auto">
-            <h3 className="text-center font-serif text-3xl tracking-[0.5em] mb-32 gold-text uppercase">The Pioneers</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          {/* 멤버 소개 */}
+          <section id="members" className="py-24 px-6 max-w-7xl mx-auto">
+            <h3 className="text-center font-serif text-3xl tracking-[0.3em] mb-16 gold-text font-bold uppercase">The Pioneers</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {pioneers.map((p, i) => (
-                <div key={i} className="group glass-panel p-12 rounded-3xl hover:bg-white/[0.03] transition-all duration-500 border-white/5">
-                  <h4 className="text-2xl font-serif tracking-[0.3em] mb-2 text-white group-hover:text-[#bf953f] transition-colors">{p.name}</h4>
-                  <p className="text-[10px] tracking-[0.3em] text-[#bf953f] uppercase mb-6 font-medium">{p.role}</p>
-                  
-                  <div className="flex flex-wrap gap-2 mb-8">
-                    {p.tags.map((tag, j) => (
-                      <span key={j} className="px-3 py-1 text-[9px] tracking-widest text-gray-400 border border-white/10 rounded-full bg-black/50">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  
-                  <p className="text-sm font-light text-gray-500 leading-relaxed tracking-wide">{p.desc}</p>
+                <div key={i} className="glass-panel p-10 rounded-2xl border-white/10 hover:border-[#d4af37]/50 transition-colors">
+                  <h4 className="text-3xl font-black tracking-widest text-white mb-4 uppercase">{p.name}</h4>
+                  <div className="flex flex-wrap gap-2 mb-6">{p.tags.map((t, j) => <span key={j} className="px-3 py-1 text-xs font-bold text-black bg-[#d4af37] rounded-sm">{t}</span>)}</div>
+                  <p className="text-base text-gray-100 leading-relaxed font-medium break-keep">{p.desc}</p>
                 </div>
               ))}
             </div>
           </section>
 
-          {/* 5. Archive Section (확장자 매칭 완료된 사진들) */}
-          <section id="archive" className="py-40 px-6 bg-black border-t border-white/5">
+          {/* 적대 세력 감시망 (피죤크루 & 보들쓰리) */}
+          <section id="hostile" className="py-24 px-6 bg-[#110000] border-y-4 border-red-900/50">
             <div className="max-w-7xl mx-auto">
-              <h3 className="text-center font-serif text-3xl tracking-[0.5em] mb-32 gold-text uppercase">The Archive</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div className="group relative overflow-hidden rounded-2xl aspect-square bg-[#050505] border border-white/5">
-                  <PremiumImage src="KakaoTalk_Photo_2026-05-13-14-33-07-15.png" alt="Legacy" className="w-full h-full" />
+              <div className="text-center mb-16">
+                <span className="neon-red font-bold tracking-widest text-lg animate-pulse">⚠️ THREAT LEVEL: CRITICAL ⚠️</span>
+                <h3 className="font-serif text-4xl tracking-[0.2em] mt-4 text-white font-black">적대 세력 감시망</h3>
+                <p className="text-red-300 mt-4 font-medium">무저 련합을 위협하는 불순 세력들의 동향 보고서</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                {/* 피죤 크루 */}
+                <div className="bg-black/50 p-8 border-2 border-red-800 rounded-xl">
+                  <h4 className="text-3xl text-red-500 font-black mb-4">🦅 PIGEON CREW (피죤크루)</h4>
+                  <p className="text-gray-200 mb-6 font-medium leading-relaxed">비둘기처럼 모여들어 연합의 평화를 어지럽히는 세력. 언제 어디서 튀어나올지 모르는 게릴라 전술이 특징이다.</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="aspect-square bg-[#111] rounded-lg overflow-hidden border border-red-900/50"><ArchiveImage src="KakaoTalk_Photo_2026-05-13-14-33-07-4.png" alt="Pigeon 1" className="w-full h-full opacity-80 hover:opacity-100" /></div>
+                    <div className="aspect-square bg-[#111] rounded-lg overflow-hidden border border-red-900/50"><ArchiveImage src="KakaoTalk_Photo_2026-05-13-14-33-07-5.jpeg" alt="Pigeon 2" className="w-full h-full opacity-80 hover:opacity-100" /></div>
+                  </div>
                 </div>
-                <div className="group relative overflow-hidden rounded-2xl aspect-square bg-[#050505] border border-white/5">
-                  <PremiumImage src="KakaoTalk_Photo_2026-05-13-14-33-07-14.png" alt="Discussion" className="w-full h-full" />
-                </div>
-                <div className="group relative overflow-hidden rounded-2xl aspect-square bg-[#050505] border border-white/5">
-                  <PremiumImage src="KakaoTalk_Photo_2026-05-13-14-33-07-17.png" alt="Factory" className="w-full h-full" />
-                </div>
-                <div className="group relative overflow-hidden rounded-2xl aspect-square bg-[#050505] border border-white/5">
-                  <PremiumImage src="KakaoTalk_Photo_2026-05-13-14-33-07-19.png" alt="Digital" className="w-full h-full" />
-                </div>
-                <div className="group relative overflow-hidden rounded-2xl aspect-square bg-[#050505] border border-white/5">
-                  <PremiumImage src="KakaoTalk_Photo_2026-05-13-14-33-07-18.png" alt="Expansion" className="w-full h-full" />
-                </div>
-                <div className="group relative overflow-hidden rounded-2xl aspect-square bg-[#050505] border border-white/5">
-                  <PremiumImage src="KakaoTalk_Photo_2026-05-13-14-33-07-20.png" alt="Legend" className="w-full h-full" />
-                </div>
-                <div className="lg:col-span-3 aspect-[16/9] overflow-hidden rounded-2xl bg-[#020202] border border-white/5">
-                  <PremiumImage src="KakaoTalk_Photo_2026-05-13-14-33-07-16.jpeg" alt="Exhibition" className="w-full h-full object-contain" />
+                {/* 보들쓰리 */}
+                <div className="bg-black/50 p-8 border-2 border-red-800 rounded-xl">
+                  <h4 className="text-3xl text-red-500 font-black mb-4">🍾 BOTTLE-3 (보들쓰리)</h4>
+                  <p className="text-gray-200 mb-6 font-medium leading-relaxed">우리가 언제 어디로 가더라도 욕해야 하는 대상. 보스턴에 거점을 두고 있으며 호시탐탐 무저크루를 노린다.</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="aspect-square bg-[#111] rounded-lg overflow-hidden border border-red-900/50"><ArchiveImage src="KakaoTalk_Photo_2026-05-13-14-33-07-6.png" alt="Bottle 1" className="w-full h-full opacity-80 hover:opacity-100" /></div>
+                    <div className="aspect-square bg-[#111] rounded-lg overflow-hidden border border-red-900/50"><ArchiveImage src="KakaoTalk_Photo_2026-05-13-14-33-07-7.png" alt="Bottle 2" className="w-full h-full opacity-80 hover:opacity-100" /></div>
+                  </div>
                 </div>
               </div>
             </div>
           </section>
 
-          <footer className="py-24 border-t border-white/5 text-center bg-[#030303]">
-            <p className="text-[10px] text-gray-700 tracking-[0.6em] uppercase font-light">© 2026 MUJER CREW. ALL RIGHTS RESERVED.</p>
+          {/* 대통합 련합 네트워크 */}
+          <section className="py-16 bg-[#0a0a0a] border-b border-white/10">
+            <div className="max-w-7xl mx-auto px-6 text-center">
+              <h3 className="text-xl tracking-[0.3em] mb-8 text-gray-400 font-bold uppercase">우호 동맹 련합 네트워크</h3>
+              <div className="flex flex-wrap justify-center gap-4">
+                {federations.map((c, i) => (
+                  <div key={i} className="px-5 py-2 text-sm tracking-widest font-bold text-gray-300 border border-gray-600 rounded-full bg-white/5 hover:bg-white/20 transition-colors">{c}</div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* 비디오 응원가 (총 3개 영상 사용) */}
+          <section id="anthem" className="py-24 px-6 bg-[#050505]">
+            <div className="max-w-6xl mx-auto glass-panel rounded-3xl overflow-hidden flex flex-col lg:flex-row shadow-2xl">
+              <div className="flex-1 bg-black p-8 flex flex-col gap-8">
+                <div className="flex gap-4">
+                  {tracks.map((t, i) => (
+                    <button key={i} onClick={() => {setCurrentTrack(i); setIsPlaying(false); setLyricIndex(0);}} className={`text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all ${currentTrack === i ? 'bg-[#d4af37] text-black' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}>{t.title}</button>
+                  ))}
+                </div>
+                <video key={tracks[currentTrack].videoSrc} src={tracks[currentTrack].videoSrc} controls className="w-full rounded-xl border border-gray-700 shadow-2xl" onPlay={() => setIsPlaying(true)} onPause={() => setIsPlaying(false)} />
+              </div>
+              <div className="lg:w-1/3 bg-[#111] p-10 flex flex-col justify-center text-center border-l border-white/10">
+                {tracks[currentTrack].lyrics.map((l, i) => (
+                  <p key={i} className={`transition-all duration-700 my-3 font-bold tracking-widest ${lyricIndex === i && isPlaying ? 'text-2xl text-[#d4af37]' : 'text-sm text-gray-500'}`}>{l}</p>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* 스토리텔링 아카이브 (남은 사진 전부 사용) */}
+          <section id="archive" className="py-24 px-6 bg-[#0a0a0a]">
+            <div className="max-w-7xl mx-auto">
+              <h3 className="text-center font-serif text-3xl tracking-[0.3em] mb-16 gold-text font-bold uppercase">The Incident Logs</h3>
+              
+              <div className="space-y-16">
+                {/* 사건 1: 롯데월드 파벌 싸움 */}
+                <div>
+                  <h4 className="text-2xl font-bold text-white mb-6 border-l-4 border-[#d4af37] pl-4"># 사건 번호 01: 롯데월드 파벌 싸움 (K-국악 vs IP 콜라보)</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="aspect-square rounded-xl overflow-hidden glass-panel"><ArchiveImage src="KakaoTalk_Photo_2026-05-13-14-33-07-15.png" alt="Lotte 1" className="w-full h-full" /></div>
+                    <div className="aspect-square rounded-xl overflow-hidden glass-panel"><ArchiveImage src="KakaoTalk_Photo_2026-05-13-14-33-07-14.png" alt="Lotte 2" className="w-full h-full" /></div>
+                    <div className="aspect-square rounded-xl overflow-hidden glass-panel"><ArchiveImage src="KakaoTalk_Photo_2026-05-13-14-33-07-17.png" alt="Factory" className="w-full h-full" /></div>
+                  </div>
+                </div>
+
+                {/* 사건 2: 디지털 세계관 대통합 */}
+                <div>
+                  <h4 className="text-2xl font-bold text-white mb-6 border-l-4 border-[#d4af37] pl-4"># 사건 번호 02: 디지털 세계관 대통합 (게임/메호대전)</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="aspect-square rounded-xl overflow-hidden glass-panel relative">
+                      <div className="absolute top-2 left-2 bg-black/80 px-3 py-1 text-xs font-bold text-white rounded">젤다 DLC 논란</div>
+                      <ArchiveImage src="KakaoTalk_Photo_2026-05-13-14-33-07-18.png" alt="Zelda" className="w-full h-full" />
+                    </div>
+                    <div className="aspect-square rounded-xl overflow-hidden glass-panel relative">
+                      <div className="absolute top-2 left-2 bg-black/80 px-3 py-1 text-xs font-bold text-white rounded">스플래툰 세계관</div>
+                      <ArchiveImage src="KakaoTalk_Photo_2026-05-13-14-33-07-19.png" alt="Splatoon" className="w-full h-full" />
+                    </div>
+                    <div className="aspect-square rounded-xl overflow-hidden glass-panel relative">
+                      <div className="absolute top-2 left-2 bg-black/80 px-3 py-1 text-xs font-bold text-white rounded">메호대전 종결</div>
+                      <ArchiveImage src="KakaoTalk_Photo_2026-05-13-14-33-07-20.png" alt="Messi Ronaldo" className="w-full h-full" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 사건 3: 기밀 문서 (The Vault - 남은 사진 전부 처리) */}
+                <div>
+                  <h4 className="text-2xl font-bold text-white mb-6 border-l-4 border-[#d4af37] pl-4"># 사건 번호 03: 미분류 기밀 파일 (The Vault)</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {['8.png', '9.png', '10.jpeg', '11.png', '12.png', '13.png', '21.png', '22.jpeg'].map((file, i) => (
+                      <div key={i} className="aspect-square rounded-lg overflow-hidden border-2 border-gray-800 hover:border-gray-500 transition-colors">
+                        <ArchiveImage src={`KakaoTalk_Photo_2026-05-13-14-33-07-${file}`} alt={`Vault ${i}`} className="w-full h-full opacity-60 hover:opacity-100" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <footer className="py-16 text-center text-sm text-gray-500 font-bold tracking-widest uppercase bg-[#050505] border-t border-white/10">
+            © 2026 MUJER CREW. ALL RIGHTS RESERVED.
           </footer>
         </div>
       );
     }
-
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
   </script>
 </body>
 </html>
