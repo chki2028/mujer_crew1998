@@ -1,0 +1,403 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { AlertTriangle, Flame, Skull, Zap, Bomb, Music, Disc, PlayCircle } from 'lucide-react';
+
+const BGradeImage = ({ src, alt }) => {
+  const [hasError, setHasError] = useState(false);
+
+  if (hasError) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center bg-black border-4 border-red-600 border-dashed p-4 text-center">
+        <Skull className="text-red-600 mb-2 animate-bounce" size={40} />
+        <span className="text-yellow-400 font-bold text-lg leading-tight mb-2">
+          [시스템 에러]<br/>여기에 '{alt}' 사진이 떠야 함!
+        </span>
+        <span className="text-gray-400 text-sm font-sans">
+          (현재 프리뷰 환경이라 카톡 사진을 못 불러옵니다. 실제 깃허브 서버에 사진을 올리면 정상 작동합니다!)
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <img 
+      src={src} 
+      alt={alt} 
+      className="w-full h-full object-cover"
+      onError={() => setHasError(true)}
+    />
+  );
+};
+
+export default function App() {
+  const [clickCount, setClickCount] = useState(0);
+  const [currentTrack, setCurrentTrack] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [lyricIndex, setLyricIndex] = useState(0);
+
+  const tracks = [
+    {
+      title: "TRACK 1: 무저가 부를 때",
+      videoSrc: "KakaoTalk_Video_2026-05-13-14-33-07-3.mp4",
+      lyrics: [
+        "나가자 무저크루의 븅순들과",
+        "모두 보들들 어깨마다 걸치고",
+        "무저가 언제 어디로 가더라도",
+        "우리는 욕해 보스턴 보들쓰리",
+        "무저가 부를때"
+      ]
+    },
+    {
+      title: "TRACK 2: 염병의 날개로",
+      videoSrc: "KakaoTalk_Video_2026-05-13-14-33-07-2.mp4",
+      lyrics: [
+        "돈까스팔러 어디라도 따라",
+        "염병따라 네지랄을 담아",
+        "날아가 무저년 저 보들끝까지",
+        "섬진강 염병의 날개로",
+        "campeon",
+        "synapses",
+        "bottlethree",
+        "docbond"
+      ]
+    }
+  ];
+
+  // 재생 시 병맛 노래방 자막 싱크(야매) 맞추기
+  useEffect(() => {
+    let interval;
+    if (isPlaying) {
+      interval = setInterval(() => {
+        setLyricIndex((prev) => {
+          if (prev < tracks[currentTrack].lyrics.length - 1) return prev + 1;
+          return prev;
+        });
+      }, 2500); // 약 2.5초마다 가사 이동
+    }
+    return () => clearInterval(interval);
+  }, [isPlaying, currentTrack, tracks]);
+
+  // 트랙 변경 시 자막 초기화
+  useEffect(() => {
+    setLyricIndex(0);
+  }, [currentTrack]);
+
+  const members = [
+    { 
+      name: "odonghyop", 
+      tags: ["닭갈비", "유가네 알바", "섬진강 장어", "국악고 롯데월드"], 
+      description: "odonghyop은 무저크루의 닭갈비 담당. 롯데월드 K-국악 퍼레이드를 두고 무저와 치열하게 대립 중이다. 중국 양산형 공장 취급을 받으며 극대노의 대상이 되기도 한다.",
+      color: "bg-red-600"
+    },
+    { 
+      name: "mujer", 
+      tags: ["fimo", "kakaotalk 통화", "가야금 듀오", "글로벌 마케터"], 
+      description: "mujer는 무저크루의 중심 인물. 롯데월드 외국인 타겟 IP 콜라보 마케팅을 주장하며 오동협을 압박한다. 밤에는 fimo와 카카오톡 통화로 피온을 하며 가짜 무저크루들을 색출한다.",
+      color: "bg-yellow-500 text-black"
+    },
+    { 
+      name: "chiggahwan", 
+      tags: ["폐급", "염병", "축구팬"], 
+      description: "무저크루 혼돈의 결정체. 폐급과 염병이라는 키워드로 모든 것을 파괴한다. 길거리 한복판에서 삼성 갤럭시 S25 유니폼을 입고 북을 치는 예능감 담당.",
+      color: "bg-green-500 text-black"
+    },
+    { 
+      name: "kigpark", 
+      tags: ["렘병", "codio", "박씨집안 몸종(?)", "K-뷰티 금상 기원"], 
+      description: "kigpark는 codio와 함께 기억되는 인물. 렘병이라는 키워드와 함께 '내가 박씨집안 몸종이야?!'라며 분노한다. K-뷰티 메이크업 어워드 금상을 노리고 있다는 소문이 있다.",
+      color: "bg-blue-600"
+    },
+  ];
+
+  const federations = [
+    "콩즈 crew", "gruppo 헤이크", "닥본 crew", "tienhao crew", 
+    "맥에보이해인 크라운", "rods and cons crew", "boston leaders", "염병 crew", "eel crew",
+    "GRUPPO BOTTLE-3 (보들쓰리)", "PIGEON CREW (비둘기 크루)", "트라피자 crew"
+  ];
+
+  return (
+    <div className="min-h-screen bg-black text-white font-[Impact,Arial_Black,sans-serif] overflow-x-hidden">
+      {/* 극강의 B급 애니메이션 스타일 정의 */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+        .animate-blink { animation: blink 0.5s infinite; }
+        
+        @keyframes shake {
+          0% { transform: translate(1px, 1px) rotate(0deg); }
+          10% { transform: translate(-1px, -2px) rotate(-1deg); }
+          20% { transform: translate(-3px, 0px) rotate(1deg); }
+          30% { transform: translate(3px, 2px) rotate(0deg); }
+          40% { transform: translate(1px, -1px) rotate(1deg); }
+          50% { transform: translate(-1px, 2px) rotate(-1deg); }
+          60% { transform: translate(-3px, 1px) rotate(0deg); }
+          70% { transform: translate(3px, 1px) rotate(-1deg); }
+          80% { transform: translate(-1px, -1px) rotate(1deg); }
+          90% { transform: translate(1px, 2px) rotate(0deg); }
+          100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        .animate-shake:hover { animation: shake 0.5s; animation-iteration-count: infinite; }
+        
+        @keyframes marquee {
+          0% { transform: translateX(100%); }
+          100% { transform: translateX(-100%); }
+        }
+        .animate-marquee { display: inline-block; white-space: nowrap; animation: marquee 10s linear infinite; }
+        
+        .b-grade-border { border: 8px dashed #ff0000; box-shadow: 10px 10px 0px #ffff00; }
+        .text-stroke { -webkit-text-stroke: 2px black; }
+      `}} />
+
+      {/* 헤더 / 네비게이션 */}
+      <header className="bg-yellow-400 p-4 border-b-8 border-red-600 flex justify-between items-center sticky top-0 z-50">
+        <h1 className="text-4xl text-red-600 font-black flex items-center gap-2 text-stroke tracking-widest cursor-pointer animate-shake" onClick={() => setClickCount(c => c+1)}>
+          <Bomb size={36} fill="black" /> 
+          무저 련합 (MUJER 1998)
+        </h1>
+        <a href="#chant-player" className="bg-red-600 text-yellow-400 border-4 border-black font-bold py-2 px-6 hover:bg-black hover:text-red-600 transition-colors text-xl inline-block">
+          응원가 바로가기
+        </a>
+      </header>
+
+      {/* 전광판 (응원가 마키) */}
+      <div className="bg-blue-600 text-white border-y-4 border-white py-2 overflow-hidden flex items-center">
+        <Music className="mx-4 animate-bounce min-w-[24px]" />
+        <div className="w-full overflow-hidden">
+          <div className="animate-marquee text-2xl font-bold tracking-widest whitespace-nowrap">
+            나가자 무저크루의 븅순들과 모두 보들들 어깨마다 걸치고 무저가 언제 어디로 가더라도 우리는 욕해 보스턴 보들쓰리 📢 !!! [긴급녹취] 야~ 무저! 안 들어오냐? 공부한다면서 피모하는 너는 가짜 무저크루!! (GRUPPO BOTTLE-3 EST.2025) 🚨 !!!
+          </div>
+        </div>
+      </div>
+
+      {/* 응원가 플레이어 섹션 */}
+      <section id="chant-player" className="py-16 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMiIgZmlsbD0iIzMzMyIvPjwvc3ZnPg==')] border-b-8 border-yellow-400">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-5xl md:text-6xl text-center text-green-400 font-black mb-8 text-stroke flex justify-center items-center gap-4">
+            <Disc className="animate-spin text-red-500" size={48} />
+            공식 응원가 (노래방 모드)
+            <Disc className="animate-spin text-red-500" size={48} />
+          </h2>
+          
+          <div className="bg-black border-8 border-red-600 p-6 md:p-10 flex flex-col lg:flex-row gap-8 shadow-[10px_10px_0px_#ffff00]">
+            {/* 좌측: 비디오 플레이어 */}
+            <div className="flex-1 flex flex-col gap-4">
+              <div className="flex flex-col sm:flex-row gap-2">
+                {tracks.map((track, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentTrack(idx)}
+                    className={`flex-1 py-3 px-2 font-bold text-lg md:text-xl border-4 transition-all ${currentTrack === idx ? 'bg-yellow-400 border-white text-black animate-shake' : 'bg-gray-800 border-black text-gray-400 hover:bg-gray-700'}`}
+                  >
+                    {track.title}
+                  </button>
+                ))}
+              </div>
+              <div className="border-8 border-white bg-gray-900 aspect-video flex items-center justify-center relative overflow-hidden group">
+                <video 
+                  key={tracks[currentTrack].videoSrc}
+                  src={tracks[currentTrack].videoSrc} 
+                  controls 
+                  className="w-full h-full object-contain bg-black"
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
+                  onEnded={() => setIsPlaying(false)}
+                >
+                  브라우저가 비디오를 지원하지 않습니다. (에라이 폐급아!)
+                </video>
+                <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 font-bold text-xl border-2 border-white animate-blink pointer-events-none">
+                  REC
+                </div>
+              </div>
+            </div>
+
+            {/* 우측: 노래방 자막 */}
+            <div className="flex-1 bg-blue-900 border-8 border-yellow-400 p-6 flex flex-col items-center justify-center min-h-[350px] relative overflow-hidden">
+              {/* 장식용 배경 요소 */}
+              <div className="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCI+PHBhdGggZD0iTTAgMGwxMCAxME0xMCAwaC0xMEwwIDEwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==')]"></div>
+              
+              <h3 className="text-3xl text-white mb-8 font-black bg-red-600 px-4 py-2 border-4 border-black z-10 text-center">
+                🎵 {tracks[currentTrack].title}
+              </h3>
+              
+              <div className="space-y-4 w-full text-center z-10 flex-1 flex flex-col justify-center">
+                {tracks[currentTrack].lyrics.map((line, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`transition-all duration-300 font-bold ${lyricIndex === idx && isPlaying 
+                      ? 'text-4xl md:text-5xl text-red-500 animate-shake bg-yellow-400 inline-block px-4 py-2 border-4 border-black text-stroke shadow-[5px_5px_0px_#000]' 
+                      : 'text-xl md:text-2xl text-gray-400 opacity-50'}`}
+                  >
+                    {line}
+                  </div>
+                ))}
+              </div>
+              
+              {!isPlaying && (
+                <div className="absolute bottom-6 bg-black text-green-400 border-2 border-green-400 px-6 py-2 animate-pulse font-bold text-xl md:text-2xl z-10 pointer-events-none">
+                  ▶ 재생 버튼을 눌러 염병을 시작하세요
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 메인 히어로 (련합 선언) */}
+      <section className="py-20 px-4 text-center bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PHJlY3Qgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjMDAwMCIvPjxjaXJjbGUgY3g9IjEwIiBjeT0iMTAiIHI9IjIiIGZpbGw9IiMzMzMiLz48L3N2Zz4=')]">
+        <div className="max-w-5xl mx-auto b-grade-border bg-black p-10 relative">
+          <div className="absolute -top-10 -left-10 text-yellow-400 animate-spin">
+            <Skull size={80} />
+          </div>
+          <h2 className="text-6xl md:text-8xl text-red-600 mb-6 text-stroke animate-blink">NO ROOM FOR WARFAR</h2>
+          <p className="text-3xl text-yellow-400 mb-8 bg-blue-900 inline-block p-2">
+            ONE FEDERATION. ONE PURPOSE. ONE FUTURE.
+          </p>
+          <div className="text-xl text-white space-y-4 font-sans bg-gray-900 p-6 border-4 border-yellow-400">
+            <p>우리는 무저크루다. 닭갈비를 볶고 가야금을 뜯으며 섬진강 장어를 먹는다.</p>
+            <p className="text-red-400 font-bold text-3xl mt-4">⚠️ 경고: 정상인 출입 금지 ⚠️</p>
+          </div>
+        </div>
+      </section>
+
+      {/* 대통합 련합 크루 명단 */}
+      <section className="py-10 bg-red-600 border-y-8 border-black">
+        <h2 className="text-5xl text-center text-yellow-400 text-stroke mb-10">★ 대통합 련합 세계관 ★</h2>
+        <div className="flex flex-wrap justify-center gap-4 max-w-6xl mx-auto px-4">
+          {federations.map((crew, idx) => (
+            <div key={idx} className="bg-black text-white border-4 border-yellow-400 px-6 py-4 text-2xl font-bold hover:bg-yellow-400 hover:text-black hover:scale-110 transition-transform cursor-crosshair">
+              {crew}
+            </div>
+          ))}
+          <div className="bg-blue-800 text-white border-4 border-red-500 px-6 py-4 text-2xl font-bold animate-pulse">
+            BOSTON crew GGOLTONG
+          </div>
+          <div className="bg-orange-500 text-black border-4 border-black px-6 py-4 text-2xl font-bold">
+            DDAKGALBI crew ALBA (유가네)
+          </div>
+          <div className="bg-gray-800 text-red-500 border-4 border-white px-6 py-4 text-2xl font-bold">
+            FLUKE SKATEBOARD CREW
+          </div>
+        </div>
+      </section>
+
+      {/* 멤버 소개 */}
+      <section className="py-20 px-4 max-w-7xl mx-auto">
+        <h2 className="text-6xl text-center text-white mb-16 bg-red-600 inline-block px-10 py-4 border-8 border-yellow-400 transform -rotate-2">
+          공식 인물 소개 (THE 4 HORSEMEN)
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          {members.map((member, idx) => (
+            <div key={idx} className={`b-grade-border p-8 ${member.color} animate-shake`}>
+              <h3 className="text-5xl font-black mb-4 uppercase border-b-4 border-black pb-2">
+                {member.name}
+              </h3>
+              <div className="flex flex-wrap gap-2 mb-6">
+                {member.tags.map((tag, i) => (
+                  <span key={i} className="bg-black text-white px-3 py-1 text-xl font-bold border-2 border-white">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+              <p className="text-2xl font-sans font-bold leading-relaxed border-4 border-black p-4 bg-white text-black">
+                {member.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 무저크루 정규 교육 과정 */}
+      <section className="py-20 bg-blue-900 border-t-8 border-yellow-400">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <h2 className="text-6xl text-white font-black mb-10 text-stroke animate-pulse">무저크루 공식 AP 과정 (AP Courses)</h2>
+          <div className="flex flex-col md:flex-row justify-center gap-10">
+            <div className="bg-white text-black p-6 border-8 border-blue-600 transform hover:-rotate-3 w-full max-w-lg mx-auto">
+              <h3 className="text-4xl font-black text-blue-800 mb-4 border-b-4 border-blue-800 pb-2">AP 노가다</h3>
+              <p className="text-xl font-sans font-bold text-left">건설 현장에서의 실전 노가다 기술, 체력 관리, 안전 수칙 및 현장 적응력을 평가하는 심화 과정입니다.</p>
+              <p className="mt-4 text-gray-500 font-bold text-left">Exam: May</p>
+            </div>
+            <div className="bg-white text-black p-6 border-8 border-green-600 transform hover:rotate-3 w-full max-w-lg mx-auto">
+              <h3 className="text-4xl font-black text-green-800 mb-4 border-b-4 border-green-800 pb-2">AP 쿠팡물류센터 BC</h3>
+              <p className="text-xl font-sans font-bold text-left">입고, 피킹, 패킹, 출고 프로세스와 물류 시스템을 이해하고 실무 능력을 평가하는 최고난도 과정입니다.</p>
+              <p className="mt-4 text-gray-500 font-bold text-left">Exam: May</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 충격과 공포의 갤러리 */}
+      <section className="py-20 bg-yellow-400 border-t-8 border-red-600 text-black">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-6xl text-center font-black mb-16 underline decoration-wavy decoration-red-600">
+            무저크루 아카이브 (현실 부정 금지)
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Lotte World K-국악 */}
+            <div className="bg-black p-4 border-8 border-pink-500 transform hover:-rotate-2 transition-transform">
+              <div className="w-full h-48 bg-gray-800 flex items-center justify-center border-4 border-white overflow-hidden text-center p-0">
+                <BGradeImage src="KakaoTalk_Photo_2026-05-13-14-33-07-15.png" alt="롯데월드를 점령한 K-국악 군단" />
+              </div>
+              <p className="text-pink-400 text-xl mt-4 text-center font-bold">▲ 롯데월드를 점령한 K-국악 군단</p>
+            </div>
+
+            {/* Lotte World Fight */}
+            <div className="bg-black p-4 border-8 border-red-600 transform hover:rotate-2 transition-transform">
+              <div className="w-full h-48 bg-gray-800 flex items-center justify-center border-4 border-white overflow-hidden text-center p-0">
+                <BGradeImage src="KakaoTalk_Photo_2026-05-13-14-33-07-14.png" alt="K-국악 퍼레이드 반대" />
+              </div>
+              <p className="text-red-500 text-xl mt-4 text-center font-bold">▲ "K-국악 퍼레이드? 말도 안 돼!"</p>
+            </div>
+
+            {/* Factory Anger */}
+            <div className="bg-black p-4 border-8 border-gray-600 transform hover:-rotate-1 transition-transform">
+              <div className="w-full h-48 bg-gray-800 flex items-center justify-center border-4 border-white overflow-hidden text-center p-0">
+                <BGradeImage src="KakaoTalk_Photo_2026-05-13-14-33-07-17.png" alt="오동협 중국 양산형 공장 사건" />
+              </div>
+              <p className="text-white text-xl mt-4 text-center font-bold">▲ 오동협 중국 양산형 공장 사건</p>
+            </div>
+
+            {/* Splatoon DLC */}
+            <div className="bg-black p-4 border-8 border-blue-500 transform hover:rotate-1 transition-transform">
+              <div className="w-full h-48 bg-gray-800 flex items-center justify-center border-4 border-white overflow-hidden text-center p-0 relative">
+                <div className="absolute top-2 right-2 bg-yellow-400 text-black px-2 py-1 font-bold animate-bounce text-sm z-10">NEW DLC</div>
+                <BGradeImage src="KakaoTalk_Photo_2026-05-13-14-33-07-19.jpg" alt="스플래툰 3 DLC" />
+              </div>
+              <p className="text-blue-400 text-xl mt-4 text-center font-bold">▲ 스플래툰 3 DLC: 무저 및 보들쓰리</p>
+            </div>
+
+            {/* Zelda DLC */}
+            <div className="bg-black p-4 border-8 border-green-700 transform hover:-rotate-3 transition-transform">
+              <div className="w-full h-48 bg-gray-800 flex items-center justify-center border-4 border-white overflow-hidden text-center p-0">
+                <BGradeImage src="KakaoTalk_Photo_2026-05-13-14-33-07-18.jpg" alt="젤다의 전설 DLC 무저의 염따" />
+              </div>
+              <p className="text-green-400 text-xl mt-4 text-center font-bold">▲ 젤다의 전설 DLC: 무저의 염따</p>
+            </div>
+
+            {/* Messi vs Ronaldo */}
+            <div className="bg-black p-4 border-8 border-purple-500 transform hover:rotate-3 transition-transform">
+              <div className="w-full h-48 bg-gray-800 flex items-center justify-center border-4 border-white overflow-hidden text-center p-0">
+                <BGradeImage src="KakaoTalk_Photo_2026-05-13-14-33-07-20.jpg" alt="메호대전 종결" />
+              </div>
+              <p className="text-purple-400 text-xl mt-4 text-center font-bold">▲ 메호대전 종결 (무저 vs 비둘기)</p>
+            </div>
+
+            {/* K-Beauty */}
+            <div className="bg-black p-4 border-8 border-pink-300 col-span-1 md:col-span-2 lg:col-span-3">
+               <div className="w-full h-96 bg-gray-800 flex items-center justify-center border-4 border-white overflow-hidden text-center p-0 relative">
+                 <div className="absolute top-4 left-4 bg-red-600 text-white text-2xl font-bold p-2 animate-blink z-10">눈물없인 볼수없는</div>
+                 <BGradeImage src="KakaoTalk_Photo_2026-05-13-14-33-07-16.jpeg" alt="K-뷰티 금상 기원" />
+               </div>
+               <p className="text-white text-2xl mt-4 text-center font-bold">▲ 간절한 외침: 제발 금상만 주세요</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 푸터 */}
+      <footer className="bg-black text-center py-10 border-t-8 border-red-600">
+        <h1 className="text-5xl text-yellow-400 mb-4 animate-pulse">MUJER CREW 1998</h1>
+        <p className="text-xl text-gray-500 font-sans">COPYRIGHT © 2026 련합. 정상적인 클레임은 받지 않습니다.</p>
+        <p className="text-red-600 mt-4 text-2xl">클릭 횟수: {clickCount} (아무 의미 없음)</p>
+      </footer>
+    </div>
+  );
+}
